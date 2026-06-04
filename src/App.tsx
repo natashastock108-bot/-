@@ -315,8 +315,34 @@ export default function App() {
   const fetchNewsData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/news", { cache: 'no-store' });
-      const newData: NewsItem[] = await res.json();
+      let newData: NewsItem[] = [];
+      try {
+        const res = await fetch("/api/news", { cache: 'no-store' });
+        if (res.ok) {
+          newData = await res.json();
+        } else {
+          throw new Error("Local API status not OK");
+        }
+      } catch (apiError) {
+        console.warn("Local API fetch failed, falling back to direct GAS fetch:", apiError);
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxAi0tV_o-yOuCrz-vdtROzV7sDrE80j_elWV03z_TpyWIxQQlGG-HgoI6Wh7vnS3fUew/exec?type=json";
+        const gasRes = await fetch(GAS_URL);
+        if (gasRes.ok) {
+          const rawData = await gasRes.json();
+          newData = rawData.map((item: any) => ({
+            title: item.title,
+            pubDate: item.time,
+            link: item.link,
+            content: item.summary,
+            summary: item.summary,
+            source: item.source,
+            category: item.category,
+            imageUrl: item.imageUrl
+          }));
+        } else {
+          throw new Error("Direct GAS fetch failed as well");
+        }
+      }
       
       setNews(prevNews => {
         // Merge logic: keep all unique news items
@@ -444,7 +470,15 @@ export default function App() {
     const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const normalizedSelected = normalize(selectedCategory);
     
-    // For category pages: 24-hour filter, newest first
+    // Check if there is any news in this category at all, and if there is any recent news
+    const hasAnyInCat = searchPool.some(n => normalize(n.category) === normalizedSelected);
+    const hasRecentInCat = searchPool.some(n => {
+      if (normalize(n.category) !== normalizedSelected) return false;
+      const d = new Date(n.pubDate || (n as any).time || 0);
+      return !isNaN(d.getTime()) && d >= twentyFourHoursAgo;
+    });
+
+    // For category pages: 24-hour filter, newest first (relaxed if no recent items exist)
     const categoryItems = searchPool.filter((item) => {
       const isCorrectCategory = normalize(item.category) === normalizedSelected;
       const dateVal = item.pubDate || (item as any).time;
@@ -452,8 +486,8 @@ export default function App() {
       const pubDate = new Date(dateVal);
       if (isNaN(pubDate.getTime())) return false;
       
-      // If there's a search query, relax the 24-hour constraint to show more results
-      const isWithinTimeRange = searchQuery.trim() ? true : pubDate >= twentyFourHoursAgo;
+      // If there's a search query OR no recent items exist in this category, relax the 24-hour filter
+      const isWithinTimeRange = (searchQuery.trim() || !hasRecentInCat) ? true : pubDate >= twentyFourHoursAgo;
       
       return isCorrectCategory && isWithinTimeRange;
     });
