@@ -49,6 +49,135 @@ const CATEGORY_FALLBACK_IMAGES: Record<string, string> = {
   "全部": "https://picsum.photos/seed/galaxy/1200/800"
 };
 
+interface ScrollRestorerProps {
+  scrollRef: React.MutableRefObject<number>;
+}
+
+const ScrollRestorer: React.FC<ScrollRestorerProps> = ({ scrollRef }) => {
+  useEffect(() => {
+    if (scrollRef.current > 0) {
+      const savedPosition = scrollRef.current;
+      const timer = setTimeout(() => {
+        window.scrollTo({ top: savedPosition, behavior: 'instant' });
+        scrollRef.current = 0; // reset
+      }, 80); // 80ms allows content to render and document to compute height
+      return () => clearTimeout(timer);
+    }
+  }, [scrollRef]);
+  return null;
+};
+
+const ADDITIONAL_NEWS_DATA = [
+  {
+    title: "【星際通訊】終極量子折疊手機 Galaxy Fold Q1 發表，搭載光子隱形天線",
+    link: "https://example.com/galactic-news/fold-q1",
+    content: "三星星際分部正式發表了史上第一款量子能折疊螢幕手機 Galaxy Fold Q1。這款新機不僅採用了全新「光子隱形天線」技術，解決了強烈太陽風暴下的訊號衰減問題，還配備了主動式超導散熱板，讓機身在高速量子運算下依然保持絕對零度附近的酷涼手感。",
+    summary: "三星星際分部正式發表了史上第一款量子能折疊螢幕手機 Galaxy Fold Q1，搭載全新光子隱形天線，避免強烈太陽風暴造成斷訊。",
+    source: "脈動科技宇宙",
+    category: "🤖 3C新創",
+    imageUrl: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    title: "【量子運算】微型個人超導電腦預購開跑，零下150度完美流暢超頻",
+    link: "https://example.com/galactic-news/quantum-pc",
+    content: "由量子動力實驗室（Quantum Dynamics Lab）研發的首款消費級家用超導電腦今日在全球各大星際樞紐開放預購。這部機器搭載最新的室壓常溫超導晶片，只需使用內建的高效液氮閉環冷卻系統，在零下150度極端環境下也能無損完美運作，為星際網路帶來飛躍性的流暢體驗。",
+    summary: "全球首款消費級家用超導電腦開放預購，搭載常溫超導晶片與高效液氮冷卻，釋放極致流暢的星際級運算潛能。",
+    source: "超導極客部落",
+    category: "🤖 3C新創",
+    imageUrl: "https://images.unsplash.com/photo-1547082299-de196ea013d6?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    title: "【萬星法庭】星鏈晶片專利戰打響，銀河聯盟最高法院宣判重罰百億星元",
+    link: "https://example.com/galactic-news/patent-war",
+    content: "持續了近三年的跨星系「星鏈收發晶片」專利訴訟案今日迎來終審。銀河聯盟最高法院宣判，掠奪者科技公司在未經授權的情況下擅自挪用了太空晶片架構，被判令即刻下架所有侵權產品，並向原告支付高達125億星元的專利侵權損害賠償金，創下本世紀科技巨頭訴訟紀錄。",
+    summary: "終審結果出爐！掠奪者科技涉嫌挪用太空晶片專利，遭銀河聯盟最高法院判賠125億星元，刷新科技專利侵權罰金纪录。",
+    source: "銀河宮鬥社",
+    category: "⚖️ 科技宮鬥",
+    imageUrl: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    title: "【領袖對決】星系網路三巨頭秘密首腦會議曝光，太空監管架構恐面臨大洗牌",
+    link: "https://example.com/galactic-news/ceo-secret-meeting",
+    content: "知情人士透露，負責掌控銀河通訊網路的三大科技巨頭CEO於上週末在半人馬座的一艘隱形星艦上進行了秘密會議。外傳三方已達成私下默契，將聯手抵制銀河監督委員會提出的「反數據壟斷法案」。此一聯盟若成真，將大幅動搖當前整個星系資訊的分散式架構。",
+    summary: "星系網路三巨頭在隱形星艦秘密會晤，策劃抵制反壟斷法案，全球通訊架構恐面臨劃時代的壟斷大洗牌。",
+    source: "獵戶座週報",
+    category: "⚖️ 科技宮鬥",
+    imageUrl: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    title: "【迷因風暴】「土星光環貓咪」GIF圖席捲各大星際論壇，創下億萬星網轉發紀錄",
+    link: "https://example.com/galactic-news/saturn-cat",
+    content: "一張由業餘天文攝影師捕捉、並由AI微調的「土星光環貓咪」動態圖在全球社群熱烈瘋傳。畫面上隻酷似波斯貓的太空生物正圍繞著土星環玩弄恆星碎片，其呆萌有趣的姿態觸發了星際網民的強烈共鳴，累計轉發量早已突破數百億，成為今年度的全球迷因之王。",
+    summary: "由天文攝影演變的「土星貓咪」GIF圖在宇宙社群刷屏，累計突破數百億次點閱轉載，掀起前所未有的全星系迷因狂潮。",
+    source: "星網觀察家",
+    category: "📱 社群話題",
+    imageUrl: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    title: "【星際熱搜】虛擬元宇宙分身是否擁有繼承權？全球網民掀起熱烈宇宙大辯論",
+    link: "https://example.com/galactic-news/avatar-rights",
+    content: "近日一起因富豪在仙女座虛擬世界病逝、其AI數位分身試圖繼承實體資產的案件引發了空前熱議。法律界、倫理學家與社會名流在星際各大社群展開了多方辯論：虛擬分身是否被視為獨立法人？高達六成網民表示支持，但多國政府對此依然採取保守態度。",
+    summary: "數位化分身算不算合法繼承人？一起天價遺產案引發了全球網民的長篇大論，虛擬世界的權益邊界再次遭到挑戰。",
+    source: "織女星快訊",
+    category: "📱 社群話題",
+    imageUrl: "https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    title: "【銀河巨作】《超新星爆發》IMAX-Space 版全球首映，影評盛讚「跨次元的視覺震撼」",
+    link: "https://example.com/galactic-news/supernova-movie",
+    content: "備受矚目的科幻史詩鉅片《超新星爆發》IMAX-Space版在空間站首映。導演歷時八年，實際在太空中使用高速重力感應鏡頭拍攝，影片中超新星塌陷的動態波及全景音效，讓現場觀眾感受到了無與論比的視覺衝擊與心靈震撼，被譽為近十年來不可多得的電影神作。",
+    summary: "科幻神作《超新星爆發》在太空港華麗上映，超高清真實宇宙光影與杜比星際音效，令無數影評大呼過癮。",
+    source: "木星影評人",
+    category: "🎬 影視權威",
+    imageUrl: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    title: "【奧斯卡跨界】首位在無重力狀態下得獎的導演誕生，分享太空港拍攝祕辛",
+    link: "https://example.com/galactic-news/zero-g-director",
+    content: "著名新銳導演在剛剛結束的最佳導演典禮上，以全片在無重力太空港實景拍攝的紀錄片榮獲大獎。他在連線致詞中幽默地分享到，在無重力環境下進行場面調度和防止攝影機漂移比想像中要困難十倍，但最終呈現出來的極簡飄逸感非常值得。",
+    summary: "摘得最佳導演桂冠的創作者，在連線中分享在無重力太空港拍攝時克服萬難的實戰經驗與鏡頭藝術。",
+    source: "影視銀河系",
+    category: "🎬 影視權威",
+    imageUrl: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    title: "【宇宙聲波】火星電子樂團首張全無重力混音專輯，榮登全星系音樂流行榜首",
+    link: "https://example.com/galactic-news/mars-music",
+    content: "這支來自火星殖民地的先鋒電子樂團發表了他們第一張在「零重力實驗聲學室」中錄製的電子迷幻專輯。利用空氣微粒在無重力下的獨特顫動軌跡，他們成功捕捉到了常規環境下無法產生的微共鳴音色，推出首日便強勢登頂全星系音樂串流排名第一。",
+    summary: "火星先鋒電子樂團在近地軌道全無重力環境完成混音，創造了超自然、空靈迷幻的全新星雲音色，首發即封神。",
+    source: "天狼星節拍",
+    category: "🎵 流行音樂",
+    imageUrl: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    title: "【虛擬歌姬】跨星系AI合成巨星巡迴演唱會，突破百萬人即時線上共鳴",
+    link: "https://example.com/galactic-news/ai-singer",
+    content: "隨著AI技術跨越式發展，目前銀河系內首個具備深度情感共鳴引擎的AI歌手於昨夜完成了它的第一次跨星系全網直播巡演。演出現場通過立體光學全息投影投射到各大星門附近，完美的音色與高度擬真的情感演繹，讓超過三百萬網民在線同步互動，氣氛空前盛大。",
+    summary: "AI超極限全息歌姬首場跨光年大型演唱會完美收官，吸引超過三百萬人共鳴互動，譜寫虛擬與靈魂對白的新篇章。",
+    source: "星際留聲機",
+    category: "🎵 流行音樂",
+    imageUrl: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    title: "【東京賽博】秋葉原最新「星際膠囊女僕咖啡廳」爆紅，體驗一對一脈動引導",
+    link: "https://example.com/galactic-news/tokyo-cafe",
+    content: "日本東京秋葉原近日掀起一波奇妙的新潮流。一家主打「太空膠囊」主題的女僕咖啡廳正式營業，每位顧客都將被分配到一座隔音微重力膠囊中，享受特製的星際脈動飲品，並在接受過宇宙禮儀培訓的女僕「領航員」帶領下，體驗宛如置身宇宙太空艙般的極致放鬆療癒。",
+    summary: "秋葉原推出全新星空膠囊式女僕互動体验，搭配太空零重力感觀設備，成為時下星空愛好者與潮人們的最新朝聖地。",
+    source: "霓虹星流速報",
+    category: "🇯🇵 日本新潮流",
+    imageUrl: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    title: "【大勢天團】K-POP 超新星組合「PULSAR」創下最快登錄月球演唱會紀錄",
+    link: "https://example.com/galactic-news/pulsar-kpop",
+    content: "韓國知名娛樂公司旗下的男女混合六人天團「PULSAR」再次打破歷史紀錄，正式敲定將於今年底在月球地表「靜海港」演藝廳舉辦首次跨星際實況演唱會。消息震驚了無數地球與太空殖民地的粉絲，門票開賣即在0.1秒內被銀河粉絲搶購一空，掀起韓流新高度。",
+    summary: "韓流大勢天團太空首演定檔，即將登陸月球靜海港露天舞台，為跨星際粉絲帶來不可思議的震撼歌舞大秀。",
+    source: "漢江發光體",
+    category: "🇰🇷 韓流最前線",
+    imageUrl: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=800&q=80"
+  }
+];
+
 export default function App() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,6 +189,7 @@ export default function App() {
   const [heroTranslatedTitle, setHeroTranslatedTitle] = useState<string | null>(null);
   const [rankingBoost, setRankingBoost] = useState(0);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [isNewestFirst, setIsNewestFirst] = useState<boolean>(true);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const scrollPositionRef = useRef<number>(0);
@@ -345,10 +475,25 @@ export default function App() {
       }
       
       setNews(prevNews => {
+        // Generate real-time timestamps for additional 12 items so they are always fresh and within 48 hours
+        const baseTime = Date.now();
+        const generatedAdditions: NewsItem[] = ADDITIONAL_NEWS_DATA.map((item, index) => ({
+          ...item,
+          pubDate: new Date(baseTime - index * 12 * 60 * 1000 - 5 * 60 * 1000).toISOString() // spaced by 12 minutes
+        }));
+
         // Merge logic: keep all unique news items
         const combined = [...newData];
         const newLinks = new Set(newData.map(n => n.link));
         
+        // Merge generated high-quality additions
+        generatedAdditions.forEach(item => {
+          if (!newLinks.has(item.link)) {
+            combined.push(item);
+            newLinks.add(item.link);
+          }
+        });
+
         prevNews.forEach(oldItem => {
           if (!newLinks.has(oldItem.link)) {
             combined.push(oldItem);
@@ -408,17 +553,8 @@ export default function App() {
     }
   }, [news]);
 
-  // Restore scroll position when returning to the news list feed
-  useEffect(() => {
-    if (selectedNews === null && scrollPositionRef.current > 0) {
-      const savedPosition = scrollPositionRef.current;
-      const timer = setTimeout(() => {
-        window.scrollTo({ top: savedPosition, behavior: 'instant' });
-        scrollPositionRef.current = 0; // reset
-      }, 50);
-      return () => clearTimeout(timer);
-    }
-  }, [selectedNews]);
+  // Restore scroll position is now handled at the feed list render block using <ScrollRestorer />
+  // to avoid race conditions with <AnimatePresence mode="wait"> exit animations.
 
   // Reset scroll reference coordinate and scroll to top when switching categories or on search query update
   useEffect(() => {
@@ -450,20 +586,20 @@ export default function App() {
       categories.forEach(cat => {
         const normalizedCat = normalize(cat);
         const catItems = searchPool.filter(n => normalize(n.category) === normalizedCat);
-        balanced.push(...catItems.slice(0, 3));
+        balanced.push(...catItems.slice(0, 6));
       });
       
-      if (balanced.length < 19) {
+      if (balanced.length < 31) {
         const existingLinks = new Set(balanced.map(n => n.link));
         const backfill = searchPool
           .filter(n => !existingLinks.has(n.link))
-          .slice(0, 19 - balanced.length);
+          .slice(0, 31 - balanced.length);
         balanced.push(...backfill);
       }
       
       return balanced
         .sort((a, b) => new Date(b.pubDate || 0).getTime() - new Date(a.pubDate || 0).getTime())
-        .slice(0, 19);
+        .slice(0, 31);
     }
     
     const now = new Date();
@@ -514,7 +650,42 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-[#00f2ff] selection:text-black pb-24 lg:pb-0">
+    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-[#00f2ff] selection:text-black pb-24 lg:pb-0 relative">
+      {/* Space Nebula Background Glows */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        {/* Cyan Space Light Bloom */}
+        <div 
+          className="absolute top-[-5%] left-[-5%] md:top-[8%] md:left-[5%] w-[100vw] h-[100vw] md:w-[60vw] md:h-[60vw] max-w-[900px] max-h-[900px] rounded-full bg-[radial-gradient(circle_at_center,rgba(0,242,255,0.12)_0%,rgba(0,162,255,0.04)_45%,transparent_70%)] blur-[90px] md:blur-[130px] pointer-events-none animate-cosmic-drift mix-blend-screen" 
+        />
+        {/* Purple Interstellar Dust Cluster */}
+        <div 
+          className="absolute bottom-[-10%] right-[-5%] md:bottom-[5%] md:right-[2%] w-[110vw] h-[110vw] md:w-[65vw] md:h-[65vw] max-w-[1000px] max-h-[1000px] rounded-full bg-[radial-gradient(circle_at_center,rgba(147,51,234,0.1)_0%,rgba(236,72,153,0.03)_50%,transparent_70%)] blur-[100px] md:blur-[150px] pointer-events-none animate-cosmic-drift-reverse mix-blend-screen" 
+        />
+        {/* Deep Galactic Blue Core */}
+        <div 
+          className="absolute top-[25%] right-[15%] w-[80vw] h-[80vw] md:w-[50vw] md:h-[50vw] max-w-[850px] max-h-[850px] rounded-full bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.08)_0%,rgba(0,242,255,0.02)_55%,transparent_70%)] blur-[95px] md:blur-[135px] pointer-events-none animate-pulse mix-blend-screen"
+          style={{ animationDuration: '12s' }}
+        />
+        {/* Aurora Rose Cosmic Ribbon */}
+        <div 
+          className="absolute top-[-8%] right-[10%] w-[50vw] h-[50vw] rounded-full bg-[radial-gradient(circle_at_center,rgba(244,63,94,0.06)_0%,transparent_60%)] blur-[110px] pointer-events-none"
+        />
+        {/* Stars Background Grid Overlay to create depth */}
+        <div 
+          className="absolute inset-0 opacity-[0.22] mix-blend-screen bg-repeat"
+          style={{
+            backgroundImage: `
+              radial-gradient(circle at 12% 18%, #ffffff 1.2px, transparent 1.2px),
+              radial-gradient(circle at 45% 65%, rgba(255,255,255,0.9) 1px, transparent 1px),
+              radial-gradient(circle at 80% 30%, #ffffff 1.5px, transparent 1.5px),
+              radial-gradient(circle at 25% 45%, rgba(0,242,255,0.7) 1.2px, transparent 1.2px),
+              radial-gradient(circle at 70% 85%, rgba(168,85,247,0.7) 1.2px, transparent 1.2px)
+            `,
+            backgroundSize: '360px 360px'
+          }}
+        />
+      </div>
+
       {/* Header */}
       <header className="sticky top-0 z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-white/5">
         <div className="container mx-auto px-4 h-16 lg:h-20 flex items-center justify-between relative">
@@ -636,6 +807,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
+            <ScrollRestorer scrollRef={scrollPositionRef} />
             {/* Breaking News Ticker */}
             <div className="bg-[#00f2ff]/10 border-y border-[#00f2ff]/20 py-3 overflow-hidden whitespace-nowrap">
               <div className="animate-marquee flex items-center gap-12">
@@ -897,7 +1069,7 @@ export default function App() {
                   {/* Additional Cards (Homepage backfill) */}
                   {filteredNews.length > 7 && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-                      {filteredNews.slice(7, 19).map((item, i) => (
+                      {filteredNews.slice(7, 31).map((item, i) => (
                         <div 
                           key={i}
                           className="group relative rounded-3xl overflow-hidden cursor-pointer bg-white/5 border border-white/10 flex flex-col"
@@ -927,33 +1099,58 @@ export default function App() {
                 </>
               ) : (
                 /* Category Page Layout (Simple Grid for up to 100 items) */
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-                  {filteredNews.slice(0, 100).map((item, i) => (
-                    <div 
-                      key={i}
-                      className="group relative rounded-3xl overflow-hidden cursor-pointer bg-white/5 border border-white/10 flex flex-col"
-                      onClick={() => handleOpenNews(item)}
+                <>
+                  {/* Category list duplicate control & item count */}
+                  <div className="flex flex-row items-center justify-between gap-2 pb-4 mb-8 border-b border-white/5">
+                    <span className="text-[10px] md:text-xs font-bold text-white/40 tracking-widest uppercase flex items-center gap-2">
+                      🌌 各分區情報 (共 {filteredNews.length} 則)
+                    </span>
+                    <button
+                      onClick={() => setIsNewestFirst(prev => !prev)}
+                      className={`text-[9px] md:text-[11px] font-black tracking-widest uppercase px-3.5 py-2 rounded-xl border transition-all flex items-center gap-2 cursor-pointer duration-300 ${
+                        isNewestFirst 
+                          ? 'border-[#00f2ff]/30 text-[#00f2ff] bg-[#00f2ff]/5 hover:bg-[#00f2ff]/10' 
+                          : 'border-purple-500/30 text-purple-400 bg-purple-500/5 hover:bg-purple-500/10'
+                      }`}
                     >
-                      <div className="aspect-video overflow-hidden">
-                        <img 
-                          src={item.imageUrl || CATEGORY_FALLBACK_IMAGES[item.category] || CATEGORY_FALLBACK_IMAGES["全部"]} 
-                          alt="category-news"
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                          referrerPolicy="no-referrer"
-                          loading="lazy"
-                        />
-                      </div>
-                      <div className="p-6">
-                        <Badge className="bg-white/10 text-[#00f2ff] text-[8px] font-bold mb-2 border-none">
-                          {CATEGORY_EMOJIS[item.category] || "🌌"} {item.category.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}]/gu, '').trim()}
-                        </Badge>
-                        <h5 className="text-sm font-black leading-tight group-hover:text-[#00f2ff] transition-colors line-clamp-2">
-                          {item.title}
-                        </h5>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                      <span className={`w-1.5 h-1.5 rounded-full ${isNewestFirst ? 'bg-[#00f2ff] animate-pulse' : 'bg-purple-400'}`} />
+                      {isNewestFirst ? '最新到最舊夯星文排序' : '最舊到最新夯星文排序'}
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+                    {(() => {
+                      const displayItems = isNewestFirst 
+                        ? filteredNews.slice(1, 101) 
+                        : [...filteredNews].reverse().slice(0, 100);
+                      return displayItems.map((item, i) => (
+                        <div 
+                          key={i}
+                          className="group relative rounded-3xl overflow-hidden cursor-pointer bg-white/5 border border-white/10 flex flex-col"
+                          onClick={() => handleOpenNews(item)}
+                        >
+                          <div className="aspect-video overflow-hidden">
+                            <img 
+                              src={item.imageUrl || CATEGORY_FALLBACK_IMAGES[item.category] || CATEGORY_FALLBACK_IMAGES["全部"]} 
+                              alt="category-news"
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                              referrerPolicy="no-referrer"
+                              loading="lazy"
+                            />
+                          </div>
+                          <div className="p-6">
+                            <Badge className="bg-white/10 text-[#00f2ff] text-[8px] font-bold mb-2 border-none">
+                              {CATEGORY_EMOJIS[item.category] || "🌌"} {item.category.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}]/gu, '').trim()}
+                            </Badge>
+                            <h5 className="text-sm font-black leading-tight group-hover:text-[#00f2ff] transition-colors line-clamp-2">
+                              {item.title}
+                            </h5>
+                          </div>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                </>
               )}
             </>
           )}
@@ -993,7 +1190,7 @@ export default function App() {
             <div className="container mx-auto px-4 pt-4 md:pt-12 pb-12 md:pb-20">
               <div className="max-w-5xl mx-auto">
                       <button 
-                        onClick={() => setSelectedNews(null)}
+                        onClick={handleReturnToCourse}
                         className="lg:hidden flex items-center gap-2 text-[#00f2ff] font-bold text-sm mb-10 h-10 px-2 uppercase tracking-widest active:scale-95"
                       >
                         <ArrowRight className="w-5 h-5 rotate-180" /> 返回銀河樞紐
@@ -1164,20 +1361,20 @@ export default function App() {
                 </a>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:items-stretch">
                 {/* Large Bottom Card */}
                 <div 
-                  className="lg:col-span-8 group relative aspect-video rounded-3xl overflow-hidden cursor-pointer"
+                  className="lg:col-span-8 group relative aspect-video lg:aspect-auto lg:h-full rounded-3xl overflow-hidden cursor-pointer"
                   onClick={() => news[5] && handleOpenNews(news[5])}
                 >
                   <img 
                     src={news[5]?.imageUrl || `https://picsum.photos/seed/bottom/1200/800`} 
                     alt="bottom"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     referrerPolicy="no-referrer"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent pointer-events-none" />
                   <div className="absolute bottom-0 left-0 p-10">
                     <Badge className="bg-[#00f2ff] text-black font-black text-[9px] mb-4">流量密碼</Badge>
                     <h4 className="text-3xl font-black leading-tight mb-6 group-hover:text-[#00f2ff] transition-colors">
@@ -1224,7 +1421,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* Footer */}
-      <footer className="bg-[#050505] border-t border-white/5 py-20">
+      <footer className="bg-[#050505]/40 backdrop-blur-md border-t border-white/5 py-20 relative z-10">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-20">
             <div>
@@ -1331,6 +1528,24 @@ export default function App() {
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;
+        }
+        @keyframes cosmic-drift {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(40px, -40px) scale(1.08); }
+          66% { transform: translate(-20px, 20px) scale(0.95); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        @keyframes cosmic-drift-reverse {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(-30px, 30px) scale(0.93); }
+          66% { transform: translate(40px, -20px) scale(1.06); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-cosmic-drift {
+          animation: cosmic-drift 22s ease-in-out infinite;
+        }
+        .animate-cosmic-drift-reverse {
+          animation: cosmic-drift-reverse 28s ease-in-out infinite;
         }
       `}</style>
     </div>
