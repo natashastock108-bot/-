@@ -367,7 +367,7 @@ export default function App() {
         // Merge logic: keep all unique news items
         const combined = [...newData];
         const newLinks = new Set(newData.map(n => n.link));
-
+        
         prevNews.forEach(oldItem => {
           if (!newLinks.has(oldItem.link)) {
             combined.push(oldItem);
@@ -524,42 +524,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-[#00f2ff] selection:text-black pb-24 lg:pb-0 relative">
-      {/* Space Nebula Background Glows */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        {/* Cyan Space Light Bloom */}
-        <div 
-          className="absolute top-[-5%] left-[-5%] md:top-[8%] md:left-[5%] w-[100vw] h-[100vw] md:w-[60vw] md:h-[60vw] max-w-[900px] max-h-[900px] rounded-full bg-[radial-gradient(circle_at_center,rgba(0,242,255,0.12)_0%,rgba(0,162,255,0.04)_45%,transparent_70%)] blur-[90px] md:blur-[130px] pointer-events-none animate-cosmic-drift mix-blend-screen" 
-        />
-        {/* Purple Interstellar Dust Cluster */}
-        <div 
-          className="absolute bottom-[-10%] right-[-5%] md:bottom-[5%] md:right-[2%] w-[110vw] h-[110vw] md:w-[65vw] md:h-[65vw] max-w-[1000px] max-h-[1000px] rounded-full bg-[radial-gradient(circle_at_center,rgba(147,51,234,0.1)_0%,rgba(236,72,153,0.03)_50%,transparent_70%)] blur-[100px] md:blur-[150px] pointer-events-none animate-cosmic-drift-reverse mix-blend-screen" 
-        />
-        {/* Deep Galactic Blue Core */}
-        <div 
-          className="absolute top-[25%] right-[15%] w-[80vw] h-[80vw] md:w-[50vw] md:h-[50vw] max-w-[850px] max-h-[850px] rounded-full bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.08)_0%,rgba(0,242,255,0.02)_55%,transparent_70%)] blur-[95px] md:blur-[135px] pointer-events-none animate-pulse mix-blend-screen"
-          style={{ animationDuration: '12s' }}
-        />
-        {/* Aurora Rose Cosmic Ribbon */}
-        <div 
-          className="absolute top-[-8%] right-[10%] w-[50vw] h-[50vw] rounded-full bg-[radial-gradient(circle_at_center,rgba(244,63,94,0.06)_0%,transparent_60%)] blur-[110px] pointer-events-none"
-        />
-        {/* Stars Background Grid Overlay to create depth */}
-        <div 
-          className="absolute inset-0 opacity-[0.22] mix-blend-screen bg-repeat"
-          style={{
-            backgroundImage: `
-              radial-gradient(circle at 12% 18%, #ffffff 1.2px, transparent 1.2px),
-              radial-gradient(circle at 45% 65%, rgba(255,255,255,0.9) 1px, transparent 1px),
-              radial-gradient(circle at 80% 30%, #ffffff 1.5px, transparent 1.5px),
-              radial-gradient(circle at 25% 45%, rgba(0,242,255,0.7) 1.2px, transparent 1.2px),
-              radial-gradient(circle at 70% 85%, rgba(168,85,247,0.7) 1.2px, transparent 1.2px)
-            `,
-            backgroundSize: '360px 360px'
-          }}
-        />
-      </div>
-
+    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-[#00f2ff] selection:text-black pb-24 lg:pb-0">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-white/5">
         <div className="container mx-auto px-4 h-16 lg:h-20 flex items-center justify-between relative">
@@ -1238,7 +1203,7 @@ export default function App() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:items-stretch">
                 {/* Large Bottom Card */}
                 <div 
-                  className="lg:col-span-8 group relative aspect-video lg:aspect-auto lg:h-full rounded-3xl overflow-hidden cursor-pointer"
+                  className="lg:col-span-8 group relative aspect-video lg:aspect-auto rounded-3xl overflow-hidden cursor-pointer"
                   onClick={() => news[5] && handleOpenNews(news[5])}
                 >
                   <img 
@@ -1248,7 +1213,7 @@ export default function App() {
                     referrerPolicy="no-referrer"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                   <div className="absolute bottom-0 left-0 p-10">
                     <Badge className="bg-[#00f2ff] text-black font-black text-[9px] mb-4">流量密碼</Badge>
                     <h4 className="text-3xl font-black leading-tight mb-6 group-hover:text-[#00f2ff] transition-colors">
@@ -1295,7 +1260,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* Footer */}
-      <footer className="bg-[#050505]/40 backdrop-blur-md border-t border-white/5 py-20 relative z-10">
+      <footer className="bg-[#050505] border-t border-white/5 py-20">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-20">
             <div>
@@ -1402,24 +1367,6 @@ export default function App() {
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;
-        }
-        @keyframes cosmic-drift {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(40px, -40px) scale(1.08); }
-          66% { transform: translate(-20px, 20px) scale(0.95); }
-          100% { transform: translate(0px, 0px) scale(1); }
-        }
-        @keyframes cosmic-drift-reverse {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(-30px, 30px) scale(0.93); }
-          66% { transform: translate(40px, -20px) scale(1.06); }
-          100% { transform: translate(0px, 0px) scale(1); }
-        }
-        .animate-cosmic-drift {
-          animation: cosmic-drift 22s ease-in-out infinite;
-        }
-        .animate-cosmic-drift-reverse {
-          animation: cosmic-drift-reverse 28s ease-in-out infinite;
         }
       `}</style>
     </div>
